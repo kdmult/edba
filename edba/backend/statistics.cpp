@@ -1,6 +1,8 @@
 #include <edba/backend/statistics.hpp>
 #include <edba/backend/interfaces.hpp>
 
+#include <boost/chrono/chrono.hpp>
+
 namespace edba { namespace backend {
 
 namespace {
@@ -71,12 +73,13 @@ statement_stat::measure_query::measure_query(
   , query_(query)
   , r_(r)
 {
-    stat_->timer_.restart();
+    stat_->timer_.start();
 }
 
-statement_stat::measure_query::~measure_query()
+statement_stat::measure_query::~measure_query() noexcept(false)
 {
-    double execution_time = stat_->timer_.elapsed();
+    boost::chrono::duration<double> seconds = boost::chrono::nanoseconds(stat_->timer_.elapsed().wall);
+    double execution_time = seconds.count();
     stat_->session_stat_->add_query_time(execution_time);
 
     if (stat_->session_stat_->user_monitor())
@@ -84,7 +87,7 @@ statement_stat::measure_query::~measure_query()
         bool succeded = !std::uncaught_exception();
         uint64_t rows = succeded ? (*r_)->rows() : uint64_t(-1);
 
-        try 
+        try
         {
             stat_->session_stat_->user_monitor()->query_executed(
                 query_->c_str(), stat_->bindings_.str(), succeded, execution_time, rows);
@@ -92,7 +95,7 @@ statement_stat::measure_query::~measure_query()
         catch(...)
         {
             // Rethrow only if there is no active exception already
-            // Althouth exception is thrown from destructor it should break everything 
+            // Althouth exception is thrown from destructor it should break everything
             // while measure_query object is kept on stack
             if(succeded)
                 throw;
@@ -107,12 +110,13 @@ statement_stat::measure_statement::measure_statement(
   , query_(query)
   , st_(st)
 {
-    stat_->timer_.restart();
+    stat_->timer_.start();
 }
 
-statement_stat::measure_statement::~measure_statement()
+statement_stat::measure_statement::~measure_statement() noexcept(false)
 {
-    double execution_time = stat_->timer_.elapsed();
+    boost::chrono::duration<double> seconds = boost::chrono::nanoseconds(stat_->timer_.elapsed().wall);
+    double execution_time = seconds.count();
     stat_->session_stat_->add_query_time(execution_time);
 
     if (stat_->session_stat_->user_monitor())
@@ -120,7 +124,7 @@ statement_stat::measure_statement::~measure_statement()
         bool succeded = !std::uncaught_exception();
         uint64_t affected = succeded ? st_->affected() : 0;
 
-        try 
+        try
         {
             stat_->session_stat_->user_monitor()->statement_executed(
                 query_->c_str(), stat_->bindings_.str(), succeded, execution_time, affected);

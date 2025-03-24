@@ -18,7 +18,9 @@ public:
     /// Construct pool of session with max limit.
     /// All sessions will be created using specified \a driver and \a conn_string.
     /// Constructor doesn`t create connection itself, instead they will be created lazily by \a open and \a try_open calls.
-    session_pool(const char* conn_string, int max_pool_size, session_monitor* sm = 0);
+    explicit session_pool(const char* conn_string, int max_pool_size, session_monitor* sm = 0);
+
+    explicit session_pool(const conn_info& ci, int max_pool_size, session_monitor* sm = 0);
 
     /// Invoke provided function object once on connection creation. This allow to setup all
     /// sessions in pool in uniform manner. configure call doesn`t affect already created sessions it will be applied only

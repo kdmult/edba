@@ -4,7 +4,7 @@
 #include <edba/session_monitor.hpp>
 #include <edba/types.hpp>
 
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 
 #include <sstream>
 
@@ -65,7 +65,7 @@ struct statement_stat
     struct measure_query
     {
         measure_query(statement_stat* stat, const std::string* query, result_ptr* r);
-        ~measure_query();
+        ~measure_query() noexcept(false);
 
     private:
         statement_stat* stat_;
@@ -76,7 +76,7 @@ struct statement_stat
     struct measure_statement
     {
         measure_statement(statement_stat* stat, const std::string* query, statement_iface* r);
-        ~measure_statement();
+        ~measure_statement() noexcept(false);
 
     private:
         statement_stat* stat_;
@@ -108,7 +108,7 @@ private:
     std::ostringstream bindings_;
 
     /// Used to evaluate time spent in query or statement
-    boost::timer timer_;
+    boost::timer::cpu_timer timer_;
 };
 
 

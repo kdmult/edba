@@ -1,3 +1,4 @@
+#include <ctime>
 #include <edba/detail/utils.hpp>
 #include <edba/errors.hpp>
 
@@ -20,7 +21,7 @@ std::string format_time(std::tm const &v)
     strftime(buf,sizeof(buf),"%Y-%m-%d %H:%M:%S",&v);
     return buf;
 }
-    
+
 std::tm parse_time(std::string const &v)
 {
     if(strlen(v.c_str())!=v.size())
@@ -37,7 +38,14 @@ std::tm parse_time(char const *v)
                 &t.tm_hour,&t.tm_min,&sec);
     if(n!=3 && n!=6)
     {
-        throw bad_value_cast();
+        n = sscanf(v,"%d:%d:%lf", &t.tm_hour,&t.tm_min,&sec);
+        if(n!=3)
+            throw bad_value_cast();
+        std::time_t tim=std::time(nullptr);
+        std::tm t2=*std::localtime(&tim);
+        t.tm_year=1900+t2.tm_year;
+        t.tm_mon=1+t2.tm_mon;
+        t.tm_mday=t2.tm_mday;
     }
     t.tm_year-=1900;
     t.tm_mon-=1;
@@ -51,7 +59,7 @@ std::tm parse_time(char const *v)
 template<typename T>
 void parse_number_impl(const string_ref& r, const char* fmt, T& res)
 {
-    char buf[32];
+    char buf[32] = {0};
     EDBA_STRNCPY(buf, r.begin(), r.size());
     if (0 == sscanf(buf, fmt, &res))
         throw bad_value_cast();
@@ -103,7 +111,7 @@ void parse_number(const string_ref& r, long double& num)
 
 int parse_int_no_throw(const string_ref& r)
 {
-    char buf[std::numeric_limits<int>::digits10 + 1];
+    char buf[std::numeric_limits<int>::digits10 + 1] = {0};
     EDBA_STRNCPY(buf, r.begin(), r.size());
     return atoi(buf);
 }
@@ -120,18 +128,18 @@ string_ref select_statement(
     string_ref rng = trim(_rng);
 
     // Return immediatelly empty statements.
-    if (rng.empty()) 
+    if (rng.empty())
         return rng;
 
     // If statement don`t start from ~ then it is not engine specific, return it
     if ('~' != rng.front())
         return rng;
-        
+
     // Skip ~ symbol
     rng.advance_begin(1);
 
     using namespace boost::algorithm;
-        
+
     BOOST_AUTO(spl_iter, (make_split_iterator(rng, first_finder("~"))));
     BOOST_TYPEOF(spl_iter) spl_iter_end;
 
@@ -157,7 +165,7 @@ string_ref select_statement(
 
         if (ver_major == int_ver_major && ver_minor < int_ver_minor)
             continue;
-            
+
         return *spl_iter;
     }
 
@@ -182,7 +190,7 @@ std::string select_statements_in_batch(
     for(; spl_iter != spl_iter_end; ++spl_iter)
     {
         string_ref st = trim(*spl_iter);
-        if (st.empty()) 
+        if (st.empty())
             continue;
 
         const char* mark = std::find(st.begin(), st.end(), '~');

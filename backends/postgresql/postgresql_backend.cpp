@@ -245,7 +245,7 @@ class statement : public backend::statement, public boost::static_visitor<>
 {
 public:
 
-    typedef enum 
+    typedef enum
     {
         null_param,
         text_param,
@@ -487,12 +487,12 @@ public:
                     if(params_pvalues_[i]!=0)
                     {
                         values[i]=params_pvalues_[i];
-                        lengths[i]=params_plengths_[i];
+                        lengths[i]=static_cast<int>(params_plengths_[i]);
                     }
                     else
                     {
                         values[i]=params_values_[i].c_str();
-                        lengths[i]=params_values_[i].size();
+                        lengths[i]=static_cast<int>(params_values_[i].size());
                     }
 
                     if(params_set_[i]==binary_param)
@@ -514,7 +514,7 @@ public:
             res_ = PQexecParams(
                 data_->conn_,
                 patched_query().c_str(),
-                bind_by_name_helper_.bindings_count(),
+                static_cast<int>(bind_by_name_helper_.bindings_count()),
                 0, // param types
                 pvalues,
                 plengths,
@@ -526,7 +526,7 @@ public:
             res_ = PQexecPrepared(
                 data_->conn_,
                 prepared_id_.c_str(),
-                bind_by_name_helper_.bindings_count(),
+                static_cast<int>(bind_by_name_helper_.bindings_count()),
                 pvalues,
                 plengths,
                 pformats, // format - text
@@ -653,7 +653,7 @@ public:
         else
             throw pqerror("@blob property should be either lo or bytea");
 
-        try 
+        try
         {
             conn_ = PQconnectdb(pq.c_str());
             if(!conn_)
@@ -661,7 +661,7 @@ public:
             if(PQstatus(conn_)!=CONNECTION_OK)
                 throw pqerror(conn_, "failed to connect ");
         }
-        catch(...) 
+        catch(...)
         {
             if(conn_) {
                 PQfinish(conn_);

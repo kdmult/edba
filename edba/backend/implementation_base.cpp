@@ -8,7 +8,7 @@
 #include <boost/range/algorithm/equal_range.hpp>
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/typeof/typeof.hpp>
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 
 #include <map>
 #include <list>

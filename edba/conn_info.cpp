@@ -12,7 +12,7 @@ using namespace std;
 
 namespace edba {
 
-struct conn_info::data 
+struct conn_info::data
 {
     struct string_ref_icmp
     {
@@ -36,7 +36,7 @@ conn_info::conn_info(const string_ref& conn_string) : data_(new data)
     // First get driver name
     BOOST_AUTO(colon_iter, (find(conn_string.begin(), conn_string.end(), ':')));
     if (colon_iter == conn_string.end())
-        throw invalid_connection_string("invalid_connection_string: " + to_string(conn_string) + " - driver name was not specified");
+        throw invalid_connection_string("invalid_connection_string: driver name was not specified");
 
     BOOST_AUTO(driver_name_rng, (make_iterator_range(conn_string.begin(), colon_iter)));
     trim(driver_name_rng);
@@ -47,7 +47,7 @@ conn_info::conn_info(const string_ref& conn_string) : data_(new data)
     BOOST_AUTO(si, (make_split_iterator(props, first_finder(";"))));
     BOOST_TYPEOF(si) end_si;
 
-    for(;si != end_si; ++si) 
+    for(;si != end_si; ++si)
     {
         string_ref trimmed_pair = trim(*si);
 
@@ -55,21 +55,21 @@ conn_info::conn_info(const string_ref& conn_string) : data_(new data)
         const char* eq_sign = find(trimmed_pair.begin(), trimmed_pair.end(), '=');
         string_ref key(trimmed_pair.begin(), eq_sign);
         string_ref val;
-        if (eq_sign != trimmed_pair.end()) 
+        if (eq_sign != trimmed_pair.end())
             val = string_ref(eq_sign + 1, trimmed_pair.end());
 
         // trim key and value
         trim(key);
         trim(val);
 
-        if (key.empty()) 
+        if (key.empty())
             continue;
 
         // insert pair to map
         data_->pairs_.insert(make_pair(key, val));
 
         // prepare clean connection string without edba specific tags
-        if('@' == key.front()) 
+        if('@' == key.front())
             continue;
 
         data_->clean_conn_string_.append(key.begin(), key.end());
@@ -103,7 +103,7 @@ int conn_info::get(const char* key, int def) const
     using namespace boost;
 
     BOOST_AUTO(res, data_->pairs_.find(as_literal(key)));
-    if (data_->pairs_.end() == res || res->second.empty()) 
+    if (data_->pairs_.end() == res || res->second.empty())
         return def;
 
     char buf[20] = {0};
@@ -137,7 +137,7 @@ string conn_info::pgsql_conn_string() const
 
 void conn_info::append_escaped(const string_ref& rng, string& dst)
 {
-    for(string_ref::difference_type i=0; i < rng.size(); ++i) 
+    for(string_ref::difference_type i=0; static_cast<string_ref::size_type>(i) < rng.size(); ++i)
     {
         if(rng[i]=='\\')
             dst+="\\\\";

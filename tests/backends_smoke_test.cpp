@@ -5,7 +5,7 @@
 #include <boost/format.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/foreach.hpp>
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/locale/encoding_utf.hpp>
 #include <boost/locale/encoding.hpp>
@@ -212,10 +212,10 @@ void test_string_truncation(session sess)
 
 void test_utf8(session sess)
 {
-    wstring utf16_short = L"Привет Мир ( Hello world )";
+    wstring utf16_short = L"РџСЂРёРІРµС‚ РњРёСЂ ( Hello world )";
     string utf8_short = boost::locale::conv::utf_to_utf<char>(utf16_short);
 
-    wstring utf16_long(L'р', 20000);
+    wstring utf16_long(L'СЂ', 20000);
     string utf8_long = boost::locale::conv::utf_to_utf<char>(utf16_long);
 
     vector<long long> ids_to_check;

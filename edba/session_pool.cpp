@@ -1,17 +1,17 @@
 #include <edba/session_pool.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace edba {
 
 struct session_pool::connection_proxy : backend::connection_iface
 {
-    connection_proxy(session_pool& pool, const backend::connection_ptr& conn) 
+    connection_proxy(session_pool& pool, const backend::connection_ptr& conn)
       : pool_(pool)
       , conn_(conn)
       , exec_time_on_init_(conn->total_execution_time())
-    {        
+    {
     }
-    
+
     ~connection_proxy()
     {
         mutex::scoped_lock g(pool_.pool_guard_);
@@ -29,7 +29,7 @@ struct session_pool::connection_proxy : backend::connection_iface
     {
         return conn_->create_statement(q);
     }
-    
+
     virtual void exec_batch(const string_ref& q)
     {
         return conn_->exec_batch(q);
@@ -102,7 +102,12 @@ private:
 };
 
 session_pool::session_pool(const char* conn_string, int max_pool_size, session_monitor* sm)
-    : conn_info_(conn_string)
+    : session_pool(conn_info(conn_string), max_pool_size, sm)
+{
+}
+
+session_pool::session_pool(const conn_info& ci, int max_pool_size, session_monitor* sm)
+    : conn_info_(ci)
     , conn_left_unopened_(max_pool_size)
     , sm_(sm)
     , total_sec_(0.0)
@@ -143,7 +148,7 @@ session session_pool::open()
     }
     else // we must wait until someone will free connection for us
     {
-        pool_max_cv_.wait(g, !boost::bind(&pool_type::empty, &pool_)); 
+        pool_max_cv_.wait(g, !boost::bind(&pool_type::empty, &pool_));
         assert(!pool_.empty() && "pool_ is not empty");
 
         session sess(create_proxy(pool_.back()));

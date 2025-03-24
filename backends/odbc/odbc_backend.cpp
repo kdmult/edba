@@ -170,8 +170,8 @@ struct error_checker
         boost::format fmt("edba::backend::odbc %1% failed with error %2% (%3%)");
 
         int rec = 1;
-        SQLINTEGER err;
-        SQLSMALLINT len;
+        SQLINTEGER err = 0;
+        SQLSMALLINT len = 0;
         string msg;
 
         if (wide_)
@@ -241,7 +241,7 @@ public:
         , throw_on_error_(wide, stmt, SQL_HANDLE_STMT)
     {
         // Read number of columns
-        SQLSMALLINT columns_count;
+        SQLSMALLINT columns_count = 0;
         throw_on_error_("SQLNumResultCols") = SQLNumResultCols(stmt_, &columns_count);
         columns_.reserve(columns_count);
 
@@ -268,19 +268,19 @@ public:
                 ci.name_ = (char*)name;
             }
 
-            bool is_wide_char_type = 
+            bool is_wide_char_type =
                 SQL_WCHAR == ci.type_ ||
                 SQL_WVARCHAR == ci.type_ ||
                 SQL_WLONGVARCHAR == ci.type_;
 
-            bool is_any_char_type = 
-                is_wide_char_type || 
+            bool is_any_char_type =
+                is_wide_char_type ||
                 SQL_CHAR == ci.type_ ||
                 SQL_VARCHAR == ci.type_ ||
                 SQL_LONGVARCHAR == ci.type_;
 
-            bool is_var_size_type = 
-                is_any_char_type || 
+            bool is_var_size_type =
+                is_any_char_type ||
                 SQL_VARBINARY == ci.type_ ||
                 SQL_LONGVARBINARY == ci.type_;
 
@@ -302,7 +302,7 @@ public:
         max_column_size += 1;
 
         // Align size to 2
-        // If some column will be extracted as wide char string, we will 
+        // If some column will be extracted as wide char string, we will
         // provide size of bytes divisible by 2
         max_column_size += (max_column_size % 2);
 
@@ -336,8 +336,8 @@ public:
         typedef typename data_pair::first c_type_id;
         typedef typename data_pair::second c_type;
 
-        c_type tmp;
-        SQLLEN indicator;
+        c_type tmp = 0;
+        SQLLEN indicator = 0;
 
         throw_on_error_("SQLGetData") = SQLGetData(stmt_, fetch_col_, c_type_id::value, &tmp, sizeof(tmp), &indicator);
 
@@ -352,7 +352,7 @@ public:
     bool operator()(tm* data)
     {
         TIMESTAMP_STRUCT tmp;
-        SQLLEN indicator;
+        SQLLEN indicator = 0;
 
         throw_on_error_("SQLGetData") = SQLGetData(stmt_, fetch_col_, SQL_C_TYPE_TIMESTAMP, &tmp, sizeof(tmp), &indicator);
 
@@ -378,7 +378,7 @@ public:
 
     bool operator()(string* _data)
     {
-        SQLLEN indicator;
+        SQLLEN indicator = 0;
         string data;
 
         SQLRETURN r;
@@ -416,7 +416,7 @@ public:
 
     bool operator()(ostream* data)
     {
-        SQLLEN indicator;
+        SQLLEN indicator = 0;
         SQLRETURN r;
 
         SQLSMALLINT sqltype = columns_[fetch_col_ - 1].type_;
@@ -478,7 +478,7 @@ public:
     virtual bool is_null(int col)
     {
         char buf[4];
-        SQLLEN indicator;
+        SQLLEN indicator = 0;
         SQLRETURN r = SQLGetData(stmt_, col + 1, SQL_C_DEFAULT, buf, 0, &indicator);
 
         if (!SQL_SUCCEEDED(r))
@@ -505,7 +505,7 @@ public:
 
         if (iter == idx.end())
             return -1;
-        return columns_.project<0>(iter) - columns_.begin();
+        return static_cast<int>(columns_.project<0>(iter) - columns_.begin());
     }
 
     virtual string column_to_name(int col)
@@ -693,7 +693,7 @@ public:
     holder_sp operator()(istream* v)
     {
         const param_desc& desc = get_param_desc(bind_col_, s_generic_varbinary_desc);
-        SQLSMALLINT ctype;
+        SQLSMALLINT ctype = 0;
         switch(desc.data_type_)
         {
             case SQL_WCHAR:
@@ -789,7 +789,7 @@ public:
 
         if(p.second != SQL_NO_DATA)
         {
-            try 
+            try
             {
                 throw_on_error_(p.first) = p.second;
             }
@@ -819,7 +819,7 @@ public:
 private:
     void try_fill_params_descriptions(SQLHSTMT stmt)
     {
-        SQLSMALLINT params_no;
+        SQLSMALLINT params_no = 0;
 
         if (!SQL_SUCCEEDED(SQLNumParams(stmt, &params_no)))
             // This is bad news for us, we can`t make uniform null binding.
@@ -909,7 +909,7 @@ private:
                                         // Empty if api for SQLDescribeParam or SQLNumParams is not supported by backend.
 
     // Read write members, modified during statement life
-    detail::bind_by_name_helper 
+    detail::bind_by_name_helper
                   bind_by_name_helper_; // Convert statement parameters representation between edba style and odbc
 
     vector<holder_sp> params_;          // Contain data for parameters bound by SQLBindParameter. Data owned here will be referenced by
@@ -1135,7 +1135,7 @@ public:
 
     void set_autocommit(bool on)
     {
-        SQLPOINTER mode = (SQLPOINTER)(on ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF);
+        SQLPOINTER mode = on ? (SQLPOINTER)SQL_AUTOCOMMIT_ON : (SQLPOINTER)SQL_AUTOCOMMIT_OFF;
         error_checker(wide_, dbc_.get(), SQL_HANDLE_DBC)("SQLSetConnectAttr") = SQLSetConnectAttr(
             dbc_.get(), // handler
             SQL_ATTR_AUTOCOMMIT, // option

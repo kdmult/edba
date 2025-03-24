@@ -1,5 +1,5 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_library(sqlite3_s sqlite3.c)
+add_library(sqlite3_s STATIC sqlite3.c)
 
 set(SQLITE3_FOUND 1 PARENT_SCOPE)
 set(SQLITE3_LIBRARY sqlite3_s PARENT_SCOPE)
