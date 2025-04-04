@@ -3,8 +3,8 @@
 
 # MYSQL_HOME should point to MySQL connector root
 
-find_path(MYSQL_INCLUDE_DIR mysql.h
-  $ENV{MYSQL_INCLUDE_DIR}
+find_path(MySQL_INCLUDE_DIR mysql.h
+  $ENV{MySQL_INCLUDE_DIR}
   $ENV{MYSQL_HOME}/include
   /usr/include/mysql
   /usr/local/include/mysql
@@ -29,7 +29,7 @@ if(WIN32)
   endif()
 
   # On Windows, link against dynamic library libmysql, not static mysqlclient
-  find_library(MYSQL_LIBRARY NAMES libmysql
+  find_library(MySQL_LIBRARY NAMES libmysql
     PATHS
     $ENV{MYSQL_HOME}/lib/${libsuffixDist}
     $ENV{MYSQL_HOME}/lib/
@@ -42,7 +42,7 @@ if(WIN32)
 
 else()
 
-  find_library(MYSQL_LIBRARY NAMES mysqlclient_r
+  find_library(MySQL_LIBRARY NAMES mysqlclient_r
     PATHS
     $ENV{MYSQL_HOME}/libmysql_r/.libs
     $ENV{MYSQL_HOME}/lib
@@ -55,19 +55,19 @@ else()
     /opt/mysql/mysql/lib/mysql)
 endif()
 
-if(MYSQL_LIBRARY)
-  get_filename_component(MYSQL_LIBRARY_DIR ${MYSQL_LIBRARY} PATH)
+if(MySQL_LIBRARY)
+  get_filename_component(MySQL_LIBRARY_DIR ${MySQL_LIBRARY} PATH)
 endif()
 
-if(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY_DIR)
-  set(MYSQL_FOUND TRUE)
+if(MySQL_INCLUDE_DIR AND MySQL_LIBRARY_DIR)
+  set(MySQL_FOUND TRUE)
 
-  include_directories(${MYSQL_INCLUDE_DIR})
-  link_directories(${MYSQL_LIBRARY_DIR})
+  include_directories(${MySQL_INCLUDE_DIR})
+  link_directories(${MySQL_LIBRARY_DIR})
 
-  find_library(MYSQL_ZLIB zlib PATHS ${MYSQL_LIBRARY_DIR})
-  find_library(MYSQL_YASSL yassl PATHS ${MYSQL_LIBRARY_DIR})
-  find_library(MYSQL_TAOCRYPT taocrypt PATHS ${MYSQL_LIBRARY_DIR})
+  find_library(MySQL_ZLIB zlib PATHS ${MySQL_LIBRARY_DIR})
+  find_library(MySQL_YASSL yassl PATHS ${MYyQL_LIBRARY_DIR})
+  find_library(MySQL_TAOCRYPT taocrypt PATHS ${MySQL_LIBRARY_DIR})
 
   if(WIN32)
     set(MYSQL_CLIENT_LIBS mysqlclient)
@@ -75,15 +75,15 @@ if(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY_DIR)
     set(MYSQL_CLIENT_LIBS libmysql)
   endif()
 
-  if(MYSQL_ZLIB)
+  if(MySQL_ZLIB)
     set(MYSQL_CLIENT_LIBS ${MYSQL_CLIENT_LIBS} zlib)
   endif()
 
-  if(MYSQL_YASSL)
+  if(MySQL_YASSL)
     set(MYSQL_CLIENT_LIBS ${MYSQL_CLIENT_LIBS} yassl)
   endif()
 
-  if(MYSQL_TAOCRYPT)
+  if(MySQL_TAOCRYPT)
     set(MYSQL_CLIENT_LIBS ${MYSQL_CLIENT_LIBS} taocrypt)
   endif()
 
@@ -93,14 +93,14 @@ if(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARY_DIR)
   endif()
 endif()
 
-set(MYSQL_LIBRARIES ${MYSQL_LIBRARY})
+set(MySQL_LIBRARIES ${MySQL_LIBRARY})
 
-# Handle the QUIETLY and REQUIRED arguments and set SQLITE3_FOUND to TRUE
+# Handle the QUIETLY and REQUIRED arguments and set MySQL_FOUND to TRUE
 # if all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MySQL
   DEFAULT_MSG
-  MYSQL_INCLUDE_DIR
-  MYSQL_LIBRARIES)
+  MySQL_INCLUDE_DIR
+  MySQL_LIBRARIES)
 
-mark_as_advanced(MYSQL_INCLUDE_DIR MYSQL_LIBRARIES)
+mark_as_advanced(MySQL_INCLUDE_DIR MySQL_LIBRARIES)

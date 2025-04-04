@@ -1,1 +1,1 @@
-edba_add_backend(postgresql)
+edba_add_backend(PostgreSQL)

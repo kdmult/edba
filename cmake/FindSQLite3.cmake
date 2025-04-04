@@ -2,10 +2,10 @@
 # CMake module to search for SQLite 3 library
 #
 # On success, the macro sets the following variables:
-# SQLITE3_FOUND = if the library found
-# SQLITE3_LIBRARY = full path to the library
-# SQLITE3_LIBRARIES = full path to the library
-# SSQLITE3_INCLUDE_DIR = where to find the library headers
+# SQLite3_FOUND = if the library found
+# SQLite3_LIBRARY = full path to the library
+# SQLite3_LIBRARIES = full path to the library
+# SQLite3_INCLUDE_DIR = where to find the library headers
 #
 # Copyright (c) 2009 Mateusz Loskot <mateusz@loskot.net>
 #
@@ -14,7 +14,7 @@
 #
 ###############################################################################
 
-find_path(SQLITE3_INCLUDE_DIR
+find_path(SQLite3_INCLUDE_DIR
   NAMES sqlite3.h
   PATH_PREFIXES sqlite sqlite3
   PATHS
@@ -30,7 +30,7 @@ find_path(SQLITE3_INCLUDE_DIR
   $ENV{SystemDrive}/SQLite3/*/include)
 
 set(SQLITE3_NAMES sqlite3 sqlite3_s)
-find_library(SQLITE3_LIBRARY
+find_library(SQLite3_LIBRARY
   NAMES ${SQLITE3_NAMES}
   PATHS
   /usr/lib
@@ -43,15 +43,14 @@ find_library(SQLITE3_LIBRARY
   $ENV{SystemDrive}/SQLite3/*/lib
   ${OSGEO4W_ROOT_DIR}/lib)
 
-set(SQLITE3_LIBRARIES ${SQLITE3_LIBRARY})
+set(SQLite3_LIBRARIES ${SQLite3_LIBRARY})
 
-#message(STATUS ${SQLITE3_LIBRARY})
-# Handle the QUIETLY and REQUIRED arguments and set SQLITE3_FOUND to TRUE
+# Handle the QUIETLY and REQUIRED arguments and set SQLite3_FOUND to TRUE
 # if all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(SQLITE3
+find_package_handle_standard_args(SQLite3
   DEFAULT_MSG
-  SQLITE3_LIBRARY
-  SQLITE3_INCLUDE_DIR)
+  SQLite3_LIBRARY
+  SQLite3_INCLUDE_DIR)
 
-mark_as_advanced(SQLITE3_LIBRARY SQLITE3_INCLUDE_DIR SQLITE3_LIBRARY)
+mark_as_advanced(SQLite3_LIBRARY SQLite3_INCLUDE_DIR SQLite3_LIBRARY)

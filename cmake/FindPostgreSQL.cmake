@@ -1,10 +1,10 @@
 # - Find PostgreSQL
 # Find the PostgreSQL includes and client library
 # This module defines
-#  POSTGRESQL_INCLUDE_DIR, where to find libpq-fe.h
-#  POSTGRESQL_LIBRARIES, libraries needed to use PostgreSQL
-#  POSTGRESQL_VERSION, if found, version of PostgreSQL
-#  POSTGRESQL_FOUND, if false, do not try to use PostgreSQL
+#  PostgreSQL_INCLUDE_DIR, where to find libpq-fe.h
+#  PostgreSQL_LIBRARIES, libraries needed to use PostgreSQL
+#  PostgreSQL_VERSION, if found, version of PostgreSQL
+#  PostgreSQL_FOUND, if false, do not try to use PostgreSQL
 #
 # Copyright (c) 2010, Mateusz Loskot, <mateusz@loskot.net>
 # Copyright (c) 2006, Jaroslaw Staniek, <js@iidea.pl>
@@ -15,26 +15,26 @@
 find_program(PG_CONFIG NAMES pg_config DOC "Path to pg_config utility")
 
 if(PG_CONFIG)
-    exec_program(${PG_CONFIG}
-      ARGS "--version"
+    execute_process(
+      COMMAND ${PG_CONFIG} --version
       OUTPUT_VARIABLE PG_CONFIG_VERSION)
 
     if(${PG_CONFIG_VERSION} MATCHES "^[A-Za-z]+[ ](.*)$")
-      string(REGEX REPLACE "^[A-Za-z]+[ ](.*)$" "\\1" POSTGRESQL_VERSION "${PG_CONFIG_VERSION}")
+      string(REGEX REPLACE "^[A-Za-z]+[ ](.*)$" "\\1" PostgreSQL_VERSION "${PG_CONFIG_VERSION}")
     endif()
 
-    exec_program(${PG_CONFIG}
-      ARGS "--includedir"
+    execute_process(
+      COMMAND ${PG_CONFIG} --includedir
       OUTPUT_VARIABLE PG_CONFIG_INCLUDEDIR)  
 
-    exec_program(${PG_CONFIG}
-      ARGS "--libdir"
+    execute_process(
+      COMMAND ${PG_CONFIG} --libdir
       OUTPUT_VARIABLE PG_CONFIG_LIBDIR)
 else()
-  set(POSTGRESQL_VERSION "unknown")
+  set(PostgreSQL_VERSION "unknown")
 endif()
 
-find_path(POSTGRESQL_INCLUDE_DIR libpq-fe.h
+find_path(PostgreSQL_INCLUDE_DIR libpq-fe.h
   ${PG_CONFIG_INCLUDEDIR}
   /usr/include/server
   /usr/include/pgsql/server
@@ -45,7 +45,7 @@ find_path(POSTGRESQL_INCLUDE_DIR libpq-fe.h
   $ENV{ProgramFiles}/PostgreSQL/*/include
   $ENV{SystemDrive}/PostgreSQL/*/include)
 
-find_library(POSTGRESQL_LIBRARIES NAMES pq libpq
+find_library(PostgreSQL_LIBRARIES NAMES pq libpq
   PATHS
   ${PG_CONFIG_LIBDIR}  
   /usr/lib
@@ -59,19 +59,19 @@ find_library(POSTGRESQL_LIBRARIES NAMES pq libpq
   $ENV{ProgramFiles}/PostgreSQL/*/lib/ms
   $ENV{SystemDrive}/PostgreSQL/*/lib/ms)
 
-if(POSTGRESQL_INCLUDE_DIR AND POSTGRESQL_LIBRARIES)
-  set(POSTGRESQL_FOUND TRUE)
+if(PostgreSQL_INCLUDE_DIR AND PostgreSQL_LIBRARIES)
+  set(PostgreSQL_FOUND TRUE)
 else()
-  set(POSTGRESQL_FOUND FALSE)
+  set(PostgreSQL_FOUND FALSE)
 endif()
 
-# Handle the QUIETLY and REQUIRED arguments and set POSTGRESQL_FOUND to TRUE
+# Handle the QUIETLY and REQUIRED arguments and set PostgreSQL_FOUND to TRUE
 # if all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PostgreSQL
   DEFAULT_MSG
-  POSTGRESQL_INCLUDE_DIR
-  POSTGRESQL_LIBRARIES
-  POSTGRESQL_VERSION)
+  PostgreSQL_INCLUDE_DIR
+  PostgreSQL_LIBRARIES
+  PostgreSQL_VERSION)
 
-mark_as_advanced(POSTGRESQL_INCLUDE_DIR POSTGRESQL_LIBRARIES)
+mark_as_advanced(PostgreSQL_INCLUDE_DIR PostgreSQL_LIBRARIES)

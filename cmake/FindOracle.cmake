@@ -3,10 +3,10 @@
 # CMake module to search for Oracle client library (OCI)
 #
 # On success, the macro sets the following variables:
-# ORACLE_FOUND       = if the library found
-# ORACLE_LIBRARY     = full path to the library
-# ORACLE_LIBRARIES   = full path to the library
-# ORACLE_INCLUDE_DIR = where to find the library headers also defined,
+# Oracle_FOUND       = if the library found
+# Oracle_LIBRARY     = full path to the library
+# Oracle_LIBRARIES   = full path to the library
+# Oracle_INCLUDE_DIR = where to find the library headers also defined,
 #                       but not for general use are
 # ORACLE_VERSION     = version of library which was found, e.g. "1.2.5"
 #
@@ -26,7 +26,7 @@
 if(DEFINED ENV{ORACLE_HOME})
   set(ORACLE_HOME $ENV{ORACLE_HOME})
 
-  find_path(ORACLE_INCLUDE_DIR
+  find_path(Oracle_INCLUDE_DIR
     oci.h
     PATHS
     ${ORACLE_HOME}/rdbms/public
@@ -47,7 +47,7 @@ if(DEFINED ENV{ORACLE_HOME})
   find_library(ORACLE_OCCI_LIBRARY NAMES ${ORACLE_OCCI_NAMES} PATHS ${ORACLE_LIB_DIR})
   find_library(ORACLE_NNZ_LIBRARY NAMES ${ORACLE_NNZ_NAMES} PATHS ${ORACLE_LIB_DIR})
 
-  set(ORACLE_LIBRARY ${ORACLE_OCI_LIBRARY} ${ORACLE_OCCI_LIBRARY} ${ORACLE_NNZ_LIBRARY})
+  set(Oracle_LIBRARY ${ORACLE_OCI_LIBRARY} ${ORACLE_OCCI_LIBRARY} ${ORACLE_NNZ_LIBRARY})
   
   if(APPLE)
     set(ORACLE_OCIEI_NAMES libociei ociei)
@@ -57,22 +57,22 @@ if(DEFINED ENV{ORACLE_HOME})
       PATHS ${ORACLE_LIB_DIR})
 
     if(ORACLE_OCIEI_LIBRARY)
-      set(ORACLE_LIBRARY ${ORACLE_LIBRARY} ${ORACLE_OCIEI_LIBRARY})
+      set(Oracle_LIBRARY ${Oracle_LIBRARY} ${ORACLE_OCIEI_LIBRARY})
     else(ORACLE_OCIEI_LIBRARY)
       message(STATUS
         "libociei.dylib is not found. It may cause crash if you are building BUNDLE")
     endif()
   endif()
 
-  message("${ORACLE_LIBRARY}")
+  message("${Oracle_LIBRARY}")
 
-  set(ORACLE_LIBRARIES ${ORACLE_LIBRARY})
+  set(Oracle_LIBRARIES ${Oracle_LIBRARY})
 
 endif(DEFINED ENV{ORACLE_HOME})
 
-# Handle the QUIETLY and REQUIRED arguments and set ORACLE_FOUND to TRUE
+# Handle the QUIETLY and REQUIRED arguments and set Oracle_FOUND to TRUE
 # if all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(ORACLE DEFAULT_MSG ORACLE_LIBRARY ORACLE_INCLUDE_DIR)
+find_package_handle_standard_args(Oracle DEFAULT_MSG Oracle_LIBRARY Oracle_INCLUDE_DIR)
 
-mark_as_advanced(ORACLE_INCLUDE_DIR ORACLE_LIBRARY)
+mark_as_advanced(Oracle_INCLUDE_DIR Oracle_LIBRARY)

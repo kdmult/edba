@@ -1,1 +1,1 @@
-edba_add_backend(mysql)
+edba_add_backend(MySQL)
