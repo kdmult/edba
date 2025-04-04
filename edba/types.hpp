@@ -117,6 +117,7 @@ struct fetch_conversion
     static bool fetch(const row& res, ColOrName col_or_name, T& v)
     {
         BOOST_MPL_ASSERT_MSG(false, ADD_SPECIALIZATION_OF_FETCH_CONVERSION_FOR_TYPE, (T));
+        return false;
     }
 };
 
