@@ -1,5 +1,3 @@
-#include "monitor.hpp"
-
 #include <edba/edba.hpp>
 
 #include <boost/foreach.hpp>
@@ -9,7 +7,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace std;
 using namespace edba;
 
 const size_t DB_POOL_SIZE = 4;
@@ -17,7 +14,7 @@ const size_t THREAD_POOL_SIZE = 8;
 
 boost::atomic<size_t> total_initialized_sessions(size_t(0));
 
-void init_session(session& sess)
+void init_session(session sess)
 {
     sess.once() <<
         "~Microsoft SQL Server~create table #test(txt varchar(20))"
@@ -28,7 +25,7 @@ void init_session(session& sess)
 
 void thread_proc(session_pool& pool)
 {
-    string test_string = "fuck fuck fuck";
+    std::string test_string = "foo foo foo";
 
     try
     {
@@ -48,17 +45,17 @@ void thread_proc(session_pool& pool)
 
         for (int i = 0; i < 100; ++i)
         {
-            rowset<string> rs = pool.open() <<
+            rowset<std::string> rs = pool.open() <<
                 "~Microsoft SQL Server~select txt from #test"
                 "~~select txt from test";
 
-            BOOST_FOREACH(const string& s, rs)
+            BOOST_FOREACH(const std::string& s, rs)
                 BOOST_ASSERT(s == test_string);
         }
     }
     catch(...)
     {
-        cerr << "Thread from pool failed: " << boost::current_exception_diagnostic_information() << endl;
+        std::cerr << "Thread from pool failed: " << boost::current_exception_diagnostic_information() << std::endl;
     }
 }
 

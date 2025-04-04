@@ -12,7 +12,6 @@
 
 #include <iostream>
 
-using namespace std;
 using namespace edba;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
@@ -41,8 +40,8 @@ int main()
             << null                                         // bind null
             << exec;                                        // re-execute insert statement
 
-        cout << "Rows affected by last statement: " << st.affected() << endl;
-        cout << "Last insert row id: " << st.last_insert_id() << endl;
+        std::cout << "Rows affected by last statement: " << st.affected() << std::endl;
+        std::cout << "Last insert row id: " << st.last_insert_id() << std::endl;
 
         // Select rows.
         // Query execution is done by implicitly converting to rowset<T>
@@ -51,15 +50,15 @@ int main()
         // Loop over rows in rowset
         BOOST_FOREACH(row r, rs)
         {
-            cout << "id: " << r.get<int>("id")
+            std::cout << "id: " << r.get<int>("id")
                  << "\tdt: " << r.get<ptime>("dt")
-                 << "\ttxt: " << r.get< optional<string> >("txt") 
-                 << endl;
+                 << "\ttxt: " << r.get< optional<std::string> >("txt") 
+                 << std::endl;
         }
     }
     catch(std::exception& e)
     {
-        cout << e.what() << endl;
+        std::cout << e.what() << std::endl;
     }
 
     return 0;

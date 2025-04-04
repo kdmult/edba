@@ -25,8 +25,8 @@
 #include <sstream>
 #include <limits>
 #include <iomanip>
-
-#include <string.h>
+#include <iterator>
+#include <string>
 
 #if defined(_WIN32) || defined(__WIN32) || defined(WIN32) || defined(__CYGWIN__)
 #include <windows.h>
@@ -36,7 +36,6 @@
 namespace mpl = boost::mpl;
 using namespace boost::locale::conv;
 using namespace boost::locale;
-using namespace std;
 using namespace boost::multi_index;
 
 namespace boost {
@@ -71,7 +70,7 @@ namespace edba {
 
 struct column_info
 {
-    string name_;       // name
+    std::string name_;  // name
     SQLSMALLINT type_;  // type
 };
 
@@ -104,18 +103,18 @@ struct common_data
     env_handle env_;
     dbc_handle dbc_;
     bool wide_;
-    string engine_;
+    std::string engine_;
     int ver_major_;
     int ver_minor_;
-    string description_;
-    string sequence_last_;
-    string last_insert_id_;
+    std::string description_;
+    std::string sequence_last_;
+    std::string last_insert_id_;
     SQLUSMALLINT commit_behavior_;
     SQLUSMALLINT rollback_behavior_;
 };
 
 // backend name
-const string g_backend("odbc");
+const std::string g_backend("odbc");
 
 // create boost locale compatible locale for conversion from UTF-16 message to system default locale
 const locale g_system_locale = generator()("");

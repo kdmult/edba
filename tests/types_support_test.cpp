@@ -21,7 +21,6 @@
 #include <boost/test/unit_test.hpp>
 
 using namespace edba;
-using namespace std;
 
 namespace std {
 
@@ -73,12 +72,12 @@ BOOST_FIXTURE_TEST_CASE(BoostSharedPtrAndPtime, types_support_fixture)
 {
     // 6. Test boost::scoped_ptr
     boost::scoped_ptr<boost::gregorian::date> case6_dt(new boost::gregorian::date(2011, 1, 1));
-    boost::scoped_ptr<string> case6_str;
+    boost::scoped_ptr<std::string> case6_str;
     st << 6 << case6_dt << case6_str << exec << reset;
 
     // 6. Test boost::scoped_ptr
     boost::scoped_ptr<boost::gregorian::date> case6_dt_res;
-    boost::scoped_ptr<string> case6_str_res;
+    boost::scoped_ptr<std::string> case6_str_res;
     select_st << 6 << first_row >> case6_dt_res >> case6_str_res;
     BOOST_CHECK(*case6_dt_res == *case6_dt);
     BOOST_CHECK(!case6_str_res);
@@ -88,11 +87,11 @@ BOOST_FIXTURE_TEST_CASE(BoostSharedPtrAndGregDate, types_support_fixture)
 {
     BOOST_AUTO(case1_dt, (boost::make_shared<boost::gregorian::date>(2011, 1, 1)));
     BOOST_AUTO(case2_dt, (boost::make_shared<boost::posix_time::ptime>(*case1_dt, boost::posix_time::hours(2))));
-    boost::shared_ptr<string> case2_str;
+    boost::shared_ptr<std::string> case2_str;
     st << 2 << case2_dt << case2_str << exec << reset;
 
     boost::shared_ptr<boost::posix_time::ptime> case2_dt_res;
-    boost::shared_ptr<string> case2_str_res;
+    boost::shared_ptr<std::string> case2_str_res;
     select_st << 2 << first_row >> case2_dt_res >> case2_str_res;
     BOOST_CHECK(*case2_dt_res == *case2_dt);
     BOOST_CHECK(!case2_str);
@@ -102,12 +101,12 @@ BOOST_FIXTURE_TEST_CASE(BoostOptional, types_support_fixture)
 {
     // 7. Test boost::optional
     boost::optional<boost::gregorian::date> case7_dt = boost::gregorian::date(2011, 1, 1);
-    boost::optional<string> case7_str;
+    boost::optional<std::string> case7_str;
     st << 7 << case7_dt << case7_str << exec << reset;
 
     // 7. Test boost::optional
     boost::optional<boost::gregorian::date> case7_dt_res;
-    boost::optional<string> case7_str_res;
+    boost::optional<std::string> case7_str_res;
     select_st << 7 << first_row >> case7_dt_res >> case7_str_res;
     BOOST_CHECK(*case7_dt_res == *case7_dt);
     BOOST_CHECK(!case7_str_res);
@@ -115,7 +114,7 @@ BOOST_FIXTURE_TEST_CASE(BoostOptional, types_support_fixture)
 
 BOOST_FIXTURE_TEST_CASE(BoostTuple, types_support_fixture)
 {
-    boost::shared_ptr<string> case1_str;
+    boost::shared_ptr<std::string> case1_str;
 
     BOOST_AUTO(case1_dt, (boost::make_shared<boost::gregorian::date>(2011, 1, 1)));
     // 4. Test boost::tuple
@@ -123,7 +122,7 @@ BOOST_FIXTURE_TEST_CASE(BoostTuple, types_support_fixture)
     st << case4 << exec << reset;
 
     // 4. Test boost::tuple
-    boost::tuple< boost::gregorian::date, boost::shared_ptr<string> > case4_res;
+    boost::tuple< boost::gregorian::date, boost::shared_ptr<std::string> > case4_res;
     select_st << 4 << first_row >> case4_res;
     BOOST_CHECK(boost::get<0>(case4_res) == *boost::get<1>(case4));
     BOOST_CHECK(!boost::get<1>(case4_res));
@@ -154,7 +153,7 @@ BOOST_FIXTURE_TEST_CASE(BoostFusionVector, types_support_fixture)
 BOOST_FIXTURE_TEST_CASE(MutableRowset, types_support_fixture)
 {
     // Test mutable rowset
-    typedef boost::tuple< boost::gregorian::date, boost::shared_ptr<string> > data_type;
+    typedef boost::tuple< boost::gregorian::date, boost::shared_ptr<std::string> > data_type;
 
     rowset<data_type> rs = sess.once() << "select dt, txt from test";
     std::vector<data_type> v(rs.begin(), rs.end());
@@ -162,7 +161,7 @@ BOOST_FIXTURE_TEST_CASE(MutableRowset, types_support_fixture)
 
 BOOST_FIXTURE_TEST_CASE(ConstRowset, types_support_fixture)
 {
-    typedef boost::tuple< boost::gregorian::date, boost::shared_ptr<string> > data_type;
+    typedef boost::tuple< boost::gregorian::date, boost::shared_ptr<std::string> > data_type;
 
     const rowset<data_type> rs = sess.once() << "select dt, txt from test";
     std::vector<data_type> v(rs.begin(), rs.end());
@@ -174,12 +173,12 @@ BOOST_FIXTURE_TEST_CASE(StdSharedPtr, types_support_fixture)
 {
     // 1. Test std::shared_ptr and boost::gregorian::date
     BOOST_AUTO(case1_dt, (std::make_shared<boost::gregorian::date>(2011, 1, 1)));
-    shared_ptr<string> case1_str;
+    std::shared_ptr<std::string> case1_str;
     st << 1 << case1_dt << case1_str << exec << reset;
 
     // 1. Test std::shared_ptr and boost::gregorian::date
-    shared_ptr<boost::gregorian::date> case1_dt_res;
-    shared_ptr<string> case1_str_res;
+    std::shared_ptr<boost::gregorian::date> case1_dt_res;
+    std::shared_ptr<std::string> case1_str_res;
     select_st << 1 << first_row >> case1_dt_res >> case1_str_res;
     BOOST_CHECK(*case1_dt == *case1_dt_res);
     BOOST_CHECK(!case1_str_res);
@@ -188,13 +187,13 @@ BOOST_FIXTURE_TEST_CASE(StdSharedPtr, types_support_fixture)
 BOOST_FIXTURE_TEST_CASE(StdUniquePtr, types_support_fixture)
 {
     // 5. Test std::unique_ptr
-    unique_ptr<boost::gregorian::date> case5_dt(new boost::gregorian::date(2011, 1, 1));
-    unique_ptr<string> case5_str;
+    std::unique_ptr<boost::gregorian::date> case5_dt(new boost::gregorian::date(2011, 1, 1));
+    std::unique_ptr<std::string> case5_str;
     st << 5 << case5_dt << case5_str << exec << reset;
 
     // 5. Test std::unique_ptr
-    unique_ptr<boost::gregorian::date> case5_dt_res;
-    unique_ptr<string> case5_str_res;
+    std::unique_ptr<boost::gregorian::date> case5_dt_res;
+    std::unique_ptr<std::string> case5_str_res;
     select_st << 5 << first_row >> case5_dt_res >> case5_str_res;
     BOOST_CHECK(*case5_dt_res == *case5_dt);
     BOOST_CHECK(!case5_str_res);
@@ -206,7 +205,7 @@ BOOST_FIXTURE_TEST_CASE(StdUniquePtr, types_support_fixture)
 
 BOOST_FIXTURE_TEST_CASE(StdTuple, types_support_fixture)
 {
-    shared_ptr<string> case1_str;
+    std::shared_ptr<std::string> case1_str;
     BOOST_AUTO(case1_dt, (std::make_shared<boost::gregorian::date>(2011, 1, 1)));
 
     // 3. Test std::tuple
@@ -214,10 +213,10 @@ BOOST_FIXTURE_TEST_CASE(StdTuple, types_support_fixture)
     st << case3 << exec << reset;
 
     // 3. Test std::tuple
-    tuple<boost::gregorian::date, std::shared_ptr<string>> case3_res;
+    std::tuple<boost::gregorian::date, std::shared_ptr<std::string>> case3_res;
     select_st << 3 << first_row >> case3_res;
-    BOOST_CHECK(get<0>(case3_res) == *get<1>(case3));
-    BOOST_CHECK(!get<1>(case3_res));
+    BOOST_CHECK(std::get<0>(case3_res) == *std::get<1>(case3));
+    BOOST_CHECK(!std::get<1>(case3_res));
 
 }
 

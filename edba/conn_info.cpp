@@ -7,8 +7,7 @@
 #include <boost/algorithm/string/find_iterator.hpp>
 
 #include <map>
-
-using namespace std;
+#include <string>
 
 namespace edba {
 
@@ -22,10 +21,10 @@ struct conn_info::data
         }
     };
 
-    typedef map<string_ref, string_ref, string_ref_icmp> rng_map;
+    typedef std::map<string_ref, string_ref, string_ref_icmp> rng_map;
     rng_map pairs_;
-    string driver_name_;
-    string clean_conn_string_;
+    std::string driver_name_;
+    std::string clean_conn_string_;
 };
 
 conn_info::conn_info(const string_ref& conn_string) : data_(new data)
@@ -34,7 +33,7 @@ conn_info::conn_info(const string_ref& conn_string) : data_(new data)
     using namespace boost::algorithm;
 
     // First get driver name
-    BOOST_AUTO(colon_iter, (find(conn_string.begin(), conn_string.end(), ':')));
+    BOOST_AUTO(colon_iter, (std::find(conn_string.begin(), conn_string.end(), ':')));
     if (colon_iter == conn_string.end())
         throw invalid_connection_string("invalid_connection_string: driver name was not specified");
 
@@ -52,7 +51,7 @@ conn_info::conn_info(const string_ref& conn_string) : data_(new data)
         string_ref trimmed_pair = trim(*si);
 
         // split by '=' on key and value
-        const char* eq_sign = find(trimmed_pair.begin(), trimmed_pair.end(), '=');
+        const char* eq_sign = std::find(trimmed_pair.begin(), trimmed_pair.end(), '=');
         string_ref key(trimmed_pair.begin(), eq_sign);
         string_ref val;
         if (eq_sign != trimmed_pair.end())
@@ -66,7 +65,7 @@ conn_info::conn_info(const string_ref& conn_string) : data_(new data)
             continue;
 
         // insert pair to map
-        data_->pairs_.insert(make_pair(key, val));
+        data_->pairs_.insert(std::make_pair(key, val));
 
         // prepare clean connection string without edba specific tags
         if('@' == key.front())
@@ -93,9 +92,9 @@ string_ref conn_info::get(const char* key, const char* def) const
     return data_->pairs_.end() == res ? as_literal(def) : res->second;
 }
 
-string conn_info::get_copy(const char* key, const char* def) const
+std::string conn_info::get_copy(const char* key, const char* def) const
 {
-    return boost::copy_range<string>(get(key, def));
+    return boost::copy_range<std::string>(get(key, def));
 }
 
 int conn_info::get(const char* key, int def) const
@@ -112,14 +111,14 @@ int conn_info::get(const char* key, int def) const
     return atoi(buf);
 }
 
-const string& conn_info::conn_string() const
+const std::string& conn_info::conn_string() const
 {
     return data_->clean_conn_string_;
 }
 
-string conn_info::pgsql_conn_string() const
+std::string conn_info::pgsql_conn_string() const
 {
-    string pq_str;
+    std::string pq_str;
 
     BOOST_FOREACH(data::rng_map::const_reference p, data_->pairs_)
     {
@@ -135,7 +134,7 @@ string conn_info::pgsql_conn_string() const
     return pq_str;
 }
 
-void conn_info::append_escaped(const string_ref& rng, string& dst)
+void conn_info::append_escaped(const string_ref& rng, std::string& dst)
 {
     for(string_ref::difference_type i=0; static_cast<string_ref::size_type>(i) < rng.size(); ++i)
     {

@@ -12,7 +12,7 @@
 #include <boost/locale/generator.hpp>
 
 #define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <iostream>
 #include <ctime>
@@ -25,7 +25,6 @@
 #  define MSSQL_DRIVER "FreeTDS"
 #endif
 
-using namespace std;
 using namespace edba;
 
 const char* oracle_cleanup_seq = "~Oracle~drop sequence test1_seq_id~;";
@@ -108,7 +107,7 @@ const char* insert_test1_data =
     "~";
 
 template<typename Char, typename Traits>
-basic_ostream<Char, Traits>& operator<<(basic_ostream<Char, Traits>& os, const std::tm& t)
+std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& os, const std::tm& t)
 {
     os  << t.tm_year << "-" << t.tm_mon << "-" << t.tm_mday << " " << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec
         << " wday=" << t.tm_wday << " yday=" << t.tm_yday << " isdst=" << t.tm_isdst;
@@ -164,14 +163,14 @@ void test_escaping(session sess)
 
         sess.once() << create_test_escaping << exec;
 
-        string bad_string = "\\''\\' insert into char'";
-        string good_string = sess.escape(bad_string);
+        std::string bad_string = "\\''\\' insert into char'";
+        std::string good_string = sess.escape(bad_string);
 
-        string insert_query = boost::str(boost::format(insert_into_test_escaping_tpl) % good_string);
+        std::string insert_query = boost::str(boost::format(insert_into_test_escaping_tpl) % good_string);
 
         sess.once() << insert_query << exec;
 
-        string result;
+        std::string result;
         sess.once() << select_from_test_escaping << first_row >> result;
 
         BOOST_CHECK_EQUAL(result, bad_string);
@@ -189,13 +188,13 @@ void test_string_truncation(session sess)
     sess <<
         "~Oracle~insert into test1(id, vchar10) values(test1_seq_id.nextval, :vchar10)"
         "~~insert into test1(vchar10) values(:vchar10)"
-        << string(5, 't')
+        << std::string(5, 't')
         << exec;
 
     {
         rowset<> rs = sess <<
             "~~select * from test1 where vchar10=:txt"
-            << string(15, 't');
+            << std::string(15, 't');
 
         BOOST_CHECK(boost::empty(rs));
     }
@@ -203,7 +202,7 @@ void test_string_truncation(session sess)
     {
         rowset<> rs = sess <<
             "~~select * from test1 where vchar10=:txt"
-            << string(5, 't');
+            << std::string(5, 't');
 
         BOOST_CHECK(!boost::empty(rs));
     }
@@ -212,13 +211,13 @@ void test_string_truncation(session sess)
 
 void test_utf8(session sess)
 {
-    wstring utf16_short = L"Привет Мир ( Hello world )";
-    string utf8_short = boost::locale::conv::utf_to_utf<char>(utf16_short);
+    std::wstring utf16_short = L"Привет Мир ( Hello world )";
+    std::string utf8_short = boost::locale::conv::utf_to_utf<char>(utf16_short);
 
-    wstring utf16_long(L'р', 20000);
-    string utf8_long = boost::locale::conv::utf_to_utf<char>(utf16_long);
+    std::wstring utf16_long(L'р', 20000);
+    std::string utf8_long = boost::locale::conv::utf_to_utf<char>(utf16_long);
 
-    vector<long long> ids_to_check;
+    std::vector<long long> ids_to_check;
 
     {
         statement st = sess <<
@@ -233,7 +232,7 @@ void test_utf8(session sess)
 
     bool postgres_with_lo = sess.backend() == "PgSQL" &&
         sess.connection_info().has("@blob") &&
-        sess.connection_info().get("@blob") == string("lo");
+        sess.connection_info().get("@blob") == std::string("lo");
 
     bool oracle = sess.backend() == "oracle";
 
@@ -253,8 +252,8 @@ void test_utf8(session sess)
     // May be you want to help and implement it?
     if (!oracle && !postgres_with_lo && !odbc_without_SQLDescribeParam)
     {
-        istringstream oss_utf8_short(utf8_short);
-        istringstream oss_utf8_long(utf8_long);
+        std::istringstream oss_utf8_short(utf8_short);
+        std::istringstream oss_utf8_long(utf8_long);
 
         statement st = sess <<
             "~Oracle~insert into test1(id, nvchar100, ntxt) values(test1_seq_id.nextval, :nvchar100, :ntxt)"
@@ -271,15 +270,15 @@ void test_utf8(session sess)
 
     BOOST_FOREACH(long long id, ids_to_check)
     {
-        string vc;
-        string txt;
+        std::string vc;
+        std::string txt;
         sess << select_query << id << first_row >> into("nvchar100", vc) >> into("ntxt", txt);
 
         BOOST_CHECK_EQUAL(utf8_short, vc);
         BOOST_CHECK_EQUAL(utf8_long, txt);
 
-        ostringstream vc_ss;
-        ostringstream txt_ss;
+        std::ostringstream vc_ss;
+        std::ostringstream txt_ss;
         sess << select_query << id << first_row >> into("nvchar100", vc_ss) >> into("ntxt", txt_ss);
 
         BOOST_CHECK_EQUAL(utf8_short, vc_ss.str());
@@ -320,8 +319,8 @@ void test_transactions_and_cursors(session sess)
     // Get some valid id for select query
     long long id = sess.backend() == "oracle" ? st2.sequence_last("test1_seq_id") : id = st2.last_insert_id();
 
-    string vc;
-    string txt;
+    std::string vc;
+    std::string txt;
     // commit query
     // use row object to make cursor formally life after tr.commit
     // odbc drivers are tend to behave wierdly in that case
