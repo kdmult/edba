@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 
+project(edba)
+
 option(EDBA_ENABLE_TESTS "Add targets for test building. In case of standalone build this would be done always" OFF)
 option(EDBA_BACKEND_SQLITE3_DONT_USE_AMALGAMATION "Don`t try to use sqlite3 amalgamation shipped with edba" OFF)
 
@@ -23,7 +25,7 @@ endif()
 
 # Find boost
 add_definitions(-DBOOST_ALL_DYN_LINK=1)
-find_package(Boost 1.48.0 COMPONENTS date_time locale thread system unit_test_framework timer REQUIRED)
+find_package(Boost 1.48.0 REQUIRED COMPONENTS date_time locale thread system unit_test_framework timer)
 
 set(edba_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR};${Boost_INCLUDE_DIRS}" CACHE INTERNAL "edba include dirs")
 
@@ -37,13 +39,13 @@ endif()
 add_definitions(-DEDBA_BACKEND_LIB_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}" -DEDBA_BACKEND_LIB_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 if (WIN32)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -DBOOST_ALL_NO_LIB)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -DBOOST_ALL_NO_LIB)
 endif (WIN32)
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8)
-        add_definitions(-fvisibility=hidden -fvisibility-inlines-hidden)
-    endif()
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8)
+    add_definitions(-fvisibility=hidden -fvisibility-inlines-hidden)
+  endif()
 endif()
 
 # Path for self and boost headers
@@ -88,20 +90,20 @@ set(sources
 )
 
 if(EDBA_ENABLE)
-    add_library(edba SHARED ${sources})
-    if (WIN32)
-        target_link_libraries(edba ${Boost_LIBRARIES})
-    else()
-        target_link_libraries(edba ${Boost_LIBRARIES} dl)
-    endif()
+  add_library(edba SHARED ${sources})
+  if (WIN32)
+    target_link_libraries(edba ${Boost_LIBRARIES})
+  else()
+    target_link_libraries(edba ${Boost_LIBRARIES} dl)
+  endif()
 	if(EDBA_BACKEND_SHARED)
 		set_target_properties(edba PROPERTIES COMPILE_DEFINITIONS "EDBA_BACKEND_SHARED")
 	endif()
 endif()
 
 if(EDBA_S_ENABLE)
-    add_library(edba_s STATIC ${sources})
-    set_target_properties(edba_s PROPERTIES COMPILE_DEFINITIONS "edba_STATIC")
+  add_library(edba_s STATIC ${sources})
+  set_target_properties(edba_s PROPERTIES COMPILE_DEFINITIONS "edba_STATIC")
 	if(EDBA_S_BACKEND_SHARED)
 		set_target_properties(edba_s PROPERTIES COMPILE_DEFINITIONS "EDBA_BACKEND_SHARED")
 	endif()
@@ -142,3 +144,11 @@ set(edba_LIBRARIES edba CACHE INTERNAL "edba shared library")
 set(edba_s_LIBRARIES edba_s ${EDBA_S_BACKEND_LIBS} "all libraries required to link with edba static core")
 
 edba_install_targets(edba)
+
+if(EDBA_STANDALONE_BUILD AND CMAKE_EXPORT_COMPILE_COMMANDS)
+  file(CREATE_LINK
+    "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json"
+    SYMBOLIC
+  )
+endif()
