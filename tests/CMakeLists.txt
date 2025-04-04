@@ -2,7 +2,7 @@ find_package(Boost 1.48.0 COMPONENTS date_time locale thread unit_test_framework
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
   add_definitions(-finput-charset=cp1251)
 endif()
 
