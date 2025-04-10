@@ -25,7 +25,7 @@ endif()
 
 # Find boost
 add_definitions(-DBOOST_ALL_DYN_LINK=1)
-find_package(Boost 1.48.0 REQUIRED COMPONENTS date_time locale thread system unit_test_framework timer)
+find_package(Boost 1.75.0 REQUIRED COMPONENTS date_time locale thread system unit_test_framework timer)
 
 set(edba_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR};${Boost_INCLUDE_DIRS}" CACHE INTERNAL "edba include dirs")
 

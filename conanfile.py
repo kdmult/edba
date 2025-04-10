@@ -46,9 +46,15 @@ class ExampleRecipe(ConanFile):
         export_conandata_patches(self)
 
     def requirements(self):
-        self.requires("boost/1.87.0")
+        self.requires("boost/[>=1.75.0]")
         if self.options.with_sqlite3:
-            self.requires("sqlite3/[>=3.8.1 <4]")
+            self.requires("sqlite3/[>=3.37.2 <4]")
+        if self.options.with_odbc and self.settings.os != "Windows":
+            self.requires("odbc/[>=2.3.9]")
+        if self.options.with_mysql:
+            self.requires("libmysqlclient/[>=8.0.34]")
+        if self.options.with_postgresql:
+            self.requires("libpq/[>=14.9]")
 
     def layout(self):
         cmake_layout(self)
